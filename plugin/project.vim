@@ -190,10 +190,13 @@ function! s:Project(filename) " <<<
     "   file.
     function! s:DoSetupAndSplit()
         call s:DoSetup()                " Ensure that all the settings are right
-        let n = winnr()                 " Determine if there is a CTRL_W-p window
-        silent! wincmd p
-        if n == winnr()
-            silent! wincmd l
+        let n = winnr()
+        silent! wincmd w                      " Go to next window below or to the right
+        while &buftype != '' && winnr() != n  " Repeat that if the reached window does not contain a normal buffer, and stop if we've been all the way round
+            silent! wincmd w
+        endwhile
+        if n == winnr()                       " No normal buffer found, just use the next one, regardless of buffer type
+            silent! wincmd w
         endif
         if n == winnr()
             " If n == winnr(), then there is no CTRL_W-p window
